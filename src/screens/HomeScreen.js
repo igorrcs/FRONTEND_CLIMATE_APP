@@ -21,7 +21,7 @@ const HomeScreen = ({ navigation }) => {
   const addCity = async () => {
     try {
       // Fazendo uma requisição POST para o backend
-      const response = await axios.post('http://10.0.2.2:3000/api/city', { name: city });
+      const response = await axios.post('http://10.0.2.2:3000/api/weather/:city', { name: city });
       if (response.data) {
         Alert.alert('Success', `City ${city} added successfully!`);
         setCity(''); // Limpa o campo de entrada após adicionar
