@@ -1,4 +1,3 @@
-import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "axios";
 import React, { useState } from "react";
 
@@ -33,7 +32,7 @@ export default function HomeScreen() {
   const fetchWeatherData = async () => {
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:3000/api/weather", {
+      const response = await axios.post("http://localhost:3002/api/weather", {
         cityName: city,
         stateName: "StateExample",
         countryName: "CountryExample",
@@ -51,7 +50,7 @@ export default function HomeScreen() {
   const fetchCitySuggestions = async (query: string) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/weather/city?name=${query}`
+        `http://localhost:3002/api/weather/city?name=${query}`
       );
       if (response.data) {
         setSuggestions(response.data);
@@ -185,7 +184,7 @@ export default function HomeScreen() {
               />
             )}
 
-            <DateTimePicker
+            {/* <DateTimePicker
               value={date}
               mode="date"
               display="default"
@@ -193,7 +192,7 @@ export default function HomeScreen() {
                 const currentDate = selectedDate || date;
                 setDate(currentDate);
               }}
-            />
+            /> */}
 
             <Button
               title="Aplicar"

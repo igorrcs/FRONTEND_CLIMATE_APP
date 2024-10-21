@@ -4,6 +4,7 @@
     "strict": true,
     "jsx": "react-native", // Adicione esta linha para permitir JSX
     "allowJs": true, // Permitir JavaScript, se necessário
-    "skipLibCheck": true // Ignorar verificação de bibliotecas para evitar possíveis erros de tipagem de terceiros
+    "skipLibCheck": true, // Ignorar verificação de bibliotecas para evitar possíveis erros de tipagem de terceiros
+    "esModuleInterop": true
   }
 }

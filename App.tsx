@@ -1,4 +1,4 @@
-import HomeScreen from "./components/screens/HomeScreen/HomeScreen";
+import HomeScreen from "./src/screens/HomeScreen/HomeScreen";
 
 export default function App() {
   return <HomeScreen />;
