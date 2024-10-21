@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import {
   ActivityIndicator,
@@ -14,16 +15,18 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import Header from "./Header";
+import CitySuggestionsList from "../../components/CitySuggestionsList";
+import { WeatherData } from "../../models/WheaherData";
 
 export default function HomeScreen() {
-  const [weatherData, setWeatherData] = useState(null);
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [city, setCity] = useState("");
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date()); // Estado para armazenar a data
+  const [showDatePicker, setShowDatePicker] = useState(false); // Estado para exibir o DatePicker
   const [loading, setLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCityDateModal, setShowCityDateModal] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [cityName, setCityName] = useState<string>("");
   const [suggestions, setSuggestions] = useState<
     { id: number; name: string }[]
@@ -86,158 +89,128 @@ export default function HomeScreen() {
     setShowCityDateModal(false);
   };
 
+  const citySuggestions = [
+    { id: 1, name: "São Paulo" },
+    { id: 2, name: "Ourinhos" },
+    { id: 3, name: "Jacarezinho" },
+  ];
+
+  const handleSelectCity = (cityName: string) => {
+    console.log(`Selected city: ${cityName}`);
+  };
+
+  const onDateChange = (event: any, selectedDate: Date | undefined) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.headerButton} onPress={handleRegister}>
-          <Text style={styles.headerButtonText}>Menu</Text>
-        </TouchableOpacity>
-        <View style={styles.headerRightButtons}>
-          <TouchableOpacity style={styles.headerButton} onPress={handleLogin}>
-            <Text style={styles.headerButtonText}>Login</Text>
-          </TouchableOpacity>
+    <>
+      <View style={styles.container}>
+        <Header onLogin={handleLogin} onRegister={handleRegister} />
+
+        <ScrollView contentContainerStyle={styles.bodyContainer}>
+          <Text style={styles.title}>Weather System</Text>
+
           <TouchableOpacity
-            style={styles.headerButton}
-            onPress={handleRegister}
+            style={styles.cityDateButton}
+            onPress={openCityDateModal}
           >
-            <Text style={styles.headerButtonText}>Register</Text>
+            <Text style={styles.cityDateButtonText}>
+              Selecionar Cidade e Data
+            </Text>
           </TouchableOpacity>
-        </View>
-      </View>
 
-      <ScrollView contentContainerStyle={styles.bodyContainer}>
-        <Text style={styles.title}>Weather System</Text>
+          {loading && <ActivityIndicator size="large" color="#0000ff" />}
+          {weatherData && (
+            <View style={styles.weatherContainer}>
+              <Text style={styles.weatherText}>
+                Cidade: {weatherData.city_name}
+              </Text>
+              <Text style={styles.weatherText}>
+                Temperatura: {weatherData.temperature} °C
+              </Text>
+              <Text style={styles.weatherText}>
+                Descrição: {weatherData.weather_description}
+              </Text>
+            </View>
+          )}
 
-        <TouchableOpacity
-          style={styles.cityDateButton}
-          onPress={openCityDateModal}
+          {weatherData && (
+            <View style={styles.forecastContainer}>
+              <Text style={styles.forecastTitle}>
+                Previsoes para os proximos 3 dias:
+              </Text>
+              {weatherData.forecast.map((day, index) => (
+                <View key={index} style={styles.forecastItem}>
+                  <Text>
+                    {day.date}: {day.temp} °C - {day.description}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </ScrollView>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showCityDateModal}
+          onRequestClose={closeCityDateModal}
         >
-          <Text style={styles.cityDateButtonText}>
-            Selecionar Cidade e Data
-          </Text>
-        </TouchableOpacity>
-
-        {loading && <ActivityIndicator size="large" color="#0000ff" />}
-        {weatherData && (
-          <View style={styles.weatherContainer}>
-            <Text style={styles.weatherText}>
-              {/* Cidade: {weatherData.city_name} */}
-            </Text>
-            <Text style={styles.weatherText}>
-              Temperatura:
-              {/* {weatherData.temperature} °C */}
-            </Text>
-            <Text style={styles.weatherText}>
-              Descrição:
-              {/* {weatherData.weather_description} */}
-            </Text>
-          </View>
-        )}
-
-        {weatherData && (
-          <View style={styles.forecastContainer}>
-            <Text style={styles.forecastTitle}>
-              Previsoes para os proximos 3 dias:
-            </Text>
-            {/* {weatherData.forecast.map((day, index) => (
-              <View key={index} style={styles.forecastItem}>
-                <Text>
-                  {day.date}: {day.temp} °C - {day.description}
-                </Text>
-              </View>
-            ))}  */}
-          </View>
-        )}
-      </ScrollView>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showCityDateModal}
-        onRequestClose={closeCityDateModal}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Selecionar Cidade e Data</Text>
-            <TextInput
-              style={styles.input}
-              value={cityName}
-              onChangeText={(text) => {
-                setCityName(text);
-                fetchCitySuggestions(text);
-              }}
-              placeholder="Digite o nome da cidade"
-            />
-            {suggestions.length > 0 && (
-              <FlatList
-                data={suggestions}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.suggestion}
-                    onPress={() => selectCity(item.name)}
-                  >
-                    <Text>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
-                style={styles.suggestionsContainer}
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Selecionar Cidade e Data</Text>
+              <TextInput
+                style={styles.input}
+                value={cityName}
+                onChangeText={(text) => {
+                  setCityName(text);
+                  fetchCitySuggestions(text);
+                }}
+                placeholder="Digite o nome da cidade"
               />
-            )}
+              {suggestions.length > 0 && (
+                <CitySuggestionsList
+                  suggestions={citySuggestions}
+                  onSelectCity={handleSelectCity}
+                />
+              )}
 
-            {/* <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                const currentDate = selectedDate || date;
-                setDate(currentDate);
-              }}
-            /> */}
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(true)}
+                style={{
+                  padding: 10,
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: 5,
+                }}
+              >
+                <Text>{date.toLocaleDateString()}</Text>
+              </TouchableOpacity>
 
-            <Button
-              title="Aplicar"
-              onPress={() => {
-                fetchWeatherData();
-                closeCityDateModal();
-              }}
-            />
+              <Button
+                title="Aplicar"
+                onPress={() => {
+                  fetchWeatherData();
+                  closeCityDateModal();
+                }}
+              />
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showLoginModal}
-        onRequestClose={closeLoginModal}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Login</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="E-mail"
-              value={email}
-              onChangeText={setEmail}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Senha"
-              secureTextEntry={true}
-              value={password}
-              onChangeText={setPassword}
-            />
-            <Button title="Log In" onPress={closeLoginModal} />
-            <TouchableOpacity
-              onPress={closeLoginModal}
-              style={styles.closeButton}
-            >
-              <Text style={styles.closeButtonText}>Fechar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </View>
+        {showDatePicker && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display="default"
+            onChange={onDateChange}
+          />
+        )}
+      </View>
+    </>
   );
 }
 
@@ -247,28 +220,6 @@ const styles = {
     padding: 20,
     backgroundColor: "#f5f5f5",
   } as ViewStyle,
-  header: {
-    flexDirection: "row" as "row",
-    justifyContent: "space-between" as "space-between",
-    alignItems: "center" as "center",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    backgroundColor: "#fff",
-  } as ViewStyle,
-  headerRightButtons: {
-    flexDirection: "row" as "row",
-    alignItems: "center" as "center",
-  } as ViewStyle,
-  headerButton: {
-    padding: 10,
-    marginHorizontal: 5,
-    backgroundColor: "#4A90E2",
-    borderRadius: 5,
-  } as ViewStyle,
-  headerButtonText: {
-    fontSize: 16,
-    color: "#fff",
-  } as TextStyle,
   bodyContainer: {
     alignItems: "center",
     paddingVertical: 20,
@@ -328,16 +279,18 @@ const styles = {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   } as ViewStyle,
   modalContent: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
     width: "80%",
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    elevation: 10,
   } as ViewStyle,
   modalTitle: {
     fontSize: 18,
-    marginBottom: 10,
     fontWeight: "bold",
-  } as TextStyle,
+    marginBottom: 15,
+    textAlign: "center",
+  } as ViewStyle,
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -345,6 +298,15 @@ const styles = {
     marginBottom: 10,
     width: "100%",
     borderRadius: 5,
+  } as ViewStyle,
+  inputContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  } as ViewStyle,
+  datePicker: {
+    flex: 1,
   } as ViewStyle,
   suggestion: {
     padding: 10,
