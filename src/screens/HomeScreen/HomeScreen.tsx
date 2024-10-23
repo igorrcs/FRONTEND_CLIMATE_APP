@@ -1,36 +1,34 @@
 import axios from "axios";
 import React, { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 import {
   ActivityIndicator,
-  Button,
-  FlatList,
-  Modal,
   ScrollView,
   Text,
-  TextInput,
   TextStyle,
   TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native";
 import Header from "./Header";
-import CitySuggestionsList from "../../components/CitySuggestionsList";
-import { WeatherData } from "../../models/WheaherData";
+import { Weather } from "../../models/Weather";
+import { City } from "../../models/City";
+import CityDateParamModal from "../../components/CityDataParamModal";
+import { RootStackParamList } from "../../navigation/Navigations";
 
-export default function HomeScreen() {
-  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+const HomeScreen = () => {
+  const [weatherData, setWeatherData] = useState<Weather | null>(null);
   const [city, setCity] = useState("");
-  const [date, setDate] = useState(new Date()); // Estado para armazenar a data
-  const [showDatePicker, setShowDatePicker] = useState(false); // Estado para exibir o DatePicker
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showCityDateModal, setShowCityDateModal] = useState(false);
   const [cityName, setCityName] = useState<string>("");
-  const [suggestions, setSuggestions] = useState<
-    { id: number; name: string }[]
-  >([]);
+  const [suggestions, setSuggestions] = useState<City[]>([]);
+  const [showCityDateModal, setShowCityDateModal] = useState(false);
+
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const fetchWeatherData = async () => {
     try {
@@ -53,7 +51,7 @@ export default function HomeScreen() {
   const fetchCitySuggestions = async (query: string) => {
     try {
       const response = await axios.get(
-        `http://localhost:3002/api/weather/city?name=${query}`
+        `http://192.168.5.111:3002/api/city?name=${query}` // colocar ip local para funcionar no emulador do android
       );
       if (response.data) {
         setSuggestions(response.data);
@@ -63,40 +61,21 @@ export default function HomeScreen() {
     }
   };
 
-  const selectCity = (name: string) => {
-    setCityName(name);
-    setCity(name);
-    setSuggestions([]);
+  const handleSelectCity = (city: City) => {
+    setCityName(city.name);
+    setSuggestions([]); // Limpa as sugestões após a seleção
   };
 
   const handleLogin = () => {
-    setShowLoginModal(true);
-  };
-
-  const closeLoginModal = () => {
-    setShowLoginModal(false);
+    navigation.navigate("Login");
   };
 
   const handleRegister = () => {
-    alert("Navigate to Register screen.");
-  };
-
-  const openCityDateModal = () => {
-    setShowCityDateModal(true);
+    navigation.navigate("Register");
   };
 
   const closeCityDateModal = () => {
     setShowCityDateModal(false);
-  };
-
-  const citySuggestions = [
-    { id: 1, name: "São Paulo" },
-    { id: 2, name: "Ourinhos" },
-    { id: 3, name: "Jacarezinho" },
-  ];
-
-  const handleSelectCity = (cityName: string) => {
-    console.log(`Selected city: ${cityName}`);
   };
 
   const onDateChange = (event: any, selectedDate: Date | undefined) => {
@@ -109,14 +88,18 @@ export default function HomeScreen() {
   return (
     <>
       <View style={styles.container}>
-        <Header onLogin={handleLogin} onRegister={handleRegister} />
+        <Header
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+          navigation={navigation}
+        />
 
         <ScrollView contentContainerStyle={styles.bodyContainer}>
           <Text style={styles.title}>Weather System</Text>
 
           <TouchableOpacity
             style={styles.cityDateButton}
-            onPress={openCityDateModal}
+            onPress={() => setShowCityDateModal(true)}
           >
             <Text style={styles.cityDateButtonText}>
               Selecionar Cidade e Data
@@ -154,52 +137,20 @@ export default function HomeScreen() {
           )}
         </ScrollView>
 
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={showCityDateModal}
-          onRequestClose={closeCityDateModal}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Selecionar Cidade e Data</Text>
-              <TextInput
-                style={styles.input}
-                value={cityName}
-                onChangeText={(text) => {
-                  setCityName(text);
-                  fetchCitySuggestions(text);
-                }}
-                placeholder="Digite o nome da cidade"
-              />
-              {suggestions.length > 0 && (
-                <CitySuggestionsList
-                  suggestions={citySuggestions}
-                  onSelectCity={handleSelectCity}
-                />
-              )}
-
-              <TouchableOpacity
-                onPress={() => setShowDatePicker(true)}
-                style={{
-                  padding: 10,
-                  backgroundColor: "#f0f0f0",
-                  borderRadius: 5,
-                }}
-              >
-                <Text>{date.toLocaleDateString()}</Text>
-              </TouchableOpacity>
-
-              <Button
-                title="Aplicar"
-                onPress={() => {
-                  fetchWeatherData();
-                  closeCityDateModal();
-                }}
-              />
-            </View>
-          </View>
-        </Modal>
+        <CityDateParamModal
+          showCityDateModal={showCityDateModal}
+          closeCityDateModal={closeCityDateModal}
+          cityName={cityName}
+          setCityName={setCityName}
+          fetchCitySuggestions={fetchCitySuggestions}
+          suggestions={suggestions}
+          handleSelectCity={handleSelectCity}
+          date={date}
+          setShowDatePicker={setShowDatePicker}
+          showDatePicker={showDatePicker}
+          onDateChange={onDateChange}
+          fetchWeatherData={fetchWeatherData}
+        />
 
         {showDatePicker && (
           <DateTimePicker
@@ -212,7 +163,7 @@ export default function HomeScreen() {
       </View>
     </>
   );
-}
+};
 
 const styles = {
   container: {
@@ -272,62 +223,6 @@ const styles = {
     marginVertical: 5,
     fontSize: 16,
   } as TextStyle,
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  } as ViewStyle,
-  modalContent: {
-    width: "80%",
-    padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    elevation: 10,
-  } as ViewStyle,
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
-  } as ViewStyle,
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 10,
-    width: "100%",
-    borderRadius: 5,
-  } as ViewStyle,
-  inputContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  } as ViewStyle,
-  datePicker: {
-    flex: 1,
-  } as ViewStyle,
-  suggestion: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-  } as ViewStyle,
-  closeButton: {
-    marginTop: 10,
-    alignItems: "center",
-  } as ViewStyle,
-  closeButtonText: {
-    color: "red",
-    fontSize: 16,
-  } as TextStyle,
-  suggestionsContainer: {
-    maxHeight: 150,
-    width: "100%",
-    backgroundColor: "#fff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginTop: 5,
-  } as ViewStyle,
 };
+
+export default HomeScreen;

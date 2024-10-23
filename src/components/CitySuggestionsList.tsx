@@ -1,3 +1,5 @@
+// src/components/CitySuggestionsList.tsx
+
 import React from "react";
 import {
   FlatList,
@@ -6,10 +8,11 @@ import {
   ViewStyle,
   TextStyle,
 } from "react-native";
+import { City } from "../models/City";
 
 type CitySuggestionsListProps = {
-  suggestions: { id: number; name: string }[];
-  onSelectCity: (name: string) => void;
+  suggestions: City[];
+  onSelectCity: (city: City) => void;
 };
 
 export default function CitySuggestionsList({
@@ -23,7 +26,7 @@ export default function CitySuggestionsList({
       renderItem={({ item }) => (
         <TouchableOpacity
           style={suggestionsStyles.suggestion}
-          onPress={() => onSelectCity(item.name)}
+          onPress={() => onSelectCity(item)}
         >
           <Text>{item.name}</Text>
         </TouchableOpacity>

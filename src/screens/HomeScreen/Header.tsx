@@ -10,21 +10,28 @@ import {
 type HeaderProps = {
   onLogin: () => void;
   onRegister: () => void;
+  navigation: any;
 };
 
-export default function Header({ onLogin, onRegister }: HeaderProps) {
+export default function Header({ navigation }: HeaderProps) {
   return (
     <View style={headerStyles.header}>
-      <TouchableOpacity style={headerStyles.headerButton} onPress={onRegister}>
+      <TouchableOpacity
+        style={headerStyles.headerButton}
+        onPress={() => navigation.navigate("Home")}
+      >
         <Text style={headerStyles.headerButtonText}>Menu</Text>
       </TouchableOpacity>
       <View style={headerStyles.headerRightButtons}>
-        <TouchableOpacity style={headerStyles.headerButton} onPress={onLogin}>
+        <TouchableOpacity
+          style={headerStyles.headerButton}
+          onPress={() => navigation.navigate("Login")}
+        >
           <Text style={headerStyles.headerButtonText}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={headerStyles.headerButton}
-          onPress={onRegister}
+          onPress={() => navigation.navigate("Register")}
         >
           <Text style={headerStyles.headerButtonText}>Register</Text>
         </TouchableOpacity>

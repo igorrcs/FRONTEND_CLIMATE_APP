@@ -1,4 +1,4 @@
-export interface WeatherData {
+export interface Weather {
   city_name: string;
   temperature: number;
   weather_description: string;
