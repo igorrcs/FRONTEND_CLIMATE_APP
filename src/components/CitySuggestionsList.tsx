@@ -20,7 +20,7 @@ export default function CitySuggestionsList({
       renderItem={({ item }) => (
         <TouchableOpacity
           style={suggestionsStyles.suggestion}
-          onPress={() => onSelectCity(item)}
+          onPress={() => onSelectCity(item)} // Aqui já está correto
         >
           <Text>{item.name}</Text>
         </TouchableOpacity>
@@ -37,7 +37,7 @@ const suggestionsStyles = {
     borderColor: "#ccc",
   } as ViewStyle,
   suggestionsContainer: {
-    maxHeight: 150,
+    maxHeight: 200,
     width: "100%",
     backgroundColor: "#ffffff3e",
     borderRadius: 5,
