@@ -1,16 +1,16 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import React from "react";
 import {
+  Button,
   Modal,
-  View,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  Button,
-  StyleSheet,
+  View,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import CitySuggestionsList from "./CitySuggestionsList"; // Ajuste o caminho conforme necessário
 import { City } from "../models/City";
+import CitySuggestionsList from "./CitySuggestionsList";
 
 interface CityDateModalProps {
   showCityDateModal: boolean;
@@ -55,22 +55,24 @@ class CityDateModal extends React.Component<CityDateModalProps> {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Selecione a Cidade e a Data</Text>
 
-            <TextInput
-              value={cityName}
-              onChangeText={(text) => {
-                setCityName(text);
-                fetchCitySuggestions(text);
-              }}
-              placeholder="Digite o nome da cidade"
-              style={styles.input}
-            />
-
-            {suggestions.length > 0 && (
-              <CitySuggestionsList
-                suggestions={suggestions}
-                onSelectCity={handleSelectCity}
+            <View style={styles.selectCityContainer}>
+              <TextInput
+                value={cityName}
+                onChangeText={(text) => {
+                  setCityName(text);
+                  fetchCitySuggestions(text);
+                }}
+                placeholder="Digite o nome da cidade"
+                style={styles.input}
               />
-            )}
+
+              {suggestions.length > 0 && (
+                <CitySuggestionsList
+                  suggestions={suggestions}
+                  onSelectCity={handleSelectCity}
+                />
+              )}
+            </View>
 
             <TouchableOpacity
               onPress={() => setShowDatePicker(true)}
@@ -163,6 +165,10 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: "#333",
+  },
+  selectCityContainer: {
+    flexDirection: "column",
+    marginBottom: 15,
   },
 });
 

@@ -1,13 +1,7 @@
 // src/components/CitySuggestionsList.tsx
 
 import React from "react";
-import {
-  FlatList,
-  Text,
-  TouchableOpacity,
-  ViewStyle,
-  TextStyle,
-} from "react-native";
+import { FlatList, Text, TouchableOpacity, ViewStyle } from "react-native";
 import { City } from "../models/City";
 
 type CitySuggestionsListProps = {
@@ -38,17 +32,17 @@ export default function CitySuggestionsList({
 
 const suggestionsStyles = {
   suggestion: {
-    padding: 10,
+    padding: 8,
     borderBottomWidth: 1,
     borderColor: "#ccc",
   } as ViewStyle,
   suggestionsContainer: {
     maxHeight: 150,
     width: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff3e",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ccc",
-    marginTop: 5,
+    marginTop: -12,
   } as ViewStyle,
 };

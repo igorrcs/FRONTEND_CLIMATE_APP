@@ -1,7 +1,7 @@
-import axios from "axios";
-import React, { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import React, { useState } from "react";
 
 import {
   ActivityIndicator,
@@ -12,11 +12,11 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import Header from "./Header";
-import { Weather } from "../../models/Weather";
-import { City } from "../../models/City";
 import CityDateParamModal from "../../components/CityDataParamModal";
+import { City } from "../../models/City";
+import { Weather } from "../../models/Weather";
 import { RootStackParamList } from "../../navigation/Navigations";
+import Header from "./Header";
 
 const HomeScreen = () => {
   const [weatherData, setWeatherData] = useState<Weather | null>(null);
@@ -51,7 +51,7 @@ const HomeScreen = () => {
   const fetchCitySuggestions = async (query: string) => {
     try {
       const response = await axios.get(
-        `http://192.168.5.111:3002/api/city?name=${query}` // colocar ip local para funcionar no emulador do android
+        `http://26.205.42.213:3002/api/city?name=${query}`
       );
       if (response.data) {
         setSuggestions(response.data);
