@@ -2,9 +2,22 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "jsx": "react-native", // Adicione esta linha para permitir JSX
-    "allowJs": true, // Permitir JavaScript, se necessário
-    "skipLibCheck": true, // Ignorar verificação de bibliotecas para evitar possíveis erros de tipagem de terceiros
-    "esModuleInterop": true
-  }
+    "jsx": "react-native",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "types": ["react", "react-native"],
+    "resolveJsonModule": true
+  },
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js"
+  ]
 }

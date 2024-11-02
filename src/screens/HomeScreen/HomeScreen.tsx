@@ -1,3 +1,4 @@
+import { API_URL } from "@env";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import axios from "axios";
@@ -25,7 +26,6 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<City[]>([]);
   const [showCityDateModal, setShowCityDateModal] = useState(false);
-
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
@@ -35,11 +35,16 @@ const HomeScreen = () => {
   const fetchWeatherData = async () => {
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:3002/api/weather", {
+      const response = await axios.post(`${API_URL}/weather`, {
         cityName: cityName,
         date: date.toISOString().split("T")[0],
       });
-      setWeatherData(response.data.weather);
+
+      if (response.data && response.data.weather) {
+        setWeatherData(response.data.weather);
+      } else {
+        setWeatherData(null);
+      }
     } catch (error) {
       console.error("Error fetching weather data:", error);
     }
@@ -48,9 +53,9 @@ const HomeScreen = () => {
 
   const fetchCitySuggestions = async (query: string) => {
     try {
-      const response = await axios.get(
-        `http://192.168.5.13:3002/api/city?name=${query}`
-      );
+      console.log("API URL:", API_URL);
+
+      const response = await axios.get(`${API_URL}/city?name=${query}`);
       if (response.data) {
         setSuggestions(response.data);
       }
@@ -76,13 +81,6 @@ const HomeScreen = () => {
     if (selectedDate) {
       setDate(selectedDate);
     }
-  };
-
-  const handleCitySelection = (city: City) => {
-    setCityName(city.name);
-    setCityName(city.name);
-    setDate(date);
-    setShowCityDateModal(false);
   };
 
   return (
@@ -119,21 +117,6 @@ const HomeScreen = () => {
             </Text>
           </View>
         )}
-
-        {weatherData && (
-          <View style={styles.forecastContainer}>
-            <Text style={styles.forecastTitle}>
-              Previsoes para os proximos 3 dias:
-            </Text>
-            {weatherData.forecast.map((day, index) => (
-              <View key={index} style={styles.forecastItem}>
-                <Text>
-                  {day.date}: {day.temp} °C - {day.description}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
       </ScrollView>
 
       <CityDateModal
@@ -164,9 +147,7 @@ const HomeScreen = () => {
           Cidade: {cityName} - Data: {date?.toLocaleDateString("pt-BR")}
         </Text>
       ) : (
-        <Text style={styles.selectedInfoText}>
-          Selecione uma cidade e uma data
-        </Text>
+        <Text style={styles.selectedInfoText}></Text>
       )}
     </View>
   );
@@ -175,7 +156,7 @@ const HomeScreen = () => {
 const styles = {
   container: {
     flex: 1,
-    padding: 20,
+    padding: 0,
     backgroundColor: "#f5f5f5",
   } as ViewStyle,
   bodyContainer: {

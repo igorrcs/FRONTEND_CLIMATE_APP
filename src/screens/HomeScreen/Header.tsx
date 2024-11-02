@@ -1,10 +1,11 @@
 import React from "react";
 import {
+  StatusBar,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
   ViewStyle,
-  TextStyle,
 } from "react-native";
 
 type HeaderProps = {
@@ -16,12 +17,6 @@ type HeaderProps = {
 export default function Header({ navigation }: HeaderProps) {
   return (
     <View style={headerStyles.header}>
-      <TouchableOpacity
-        style={headerStyles.headerButton}
-        onPress={() => navigation.navigate("Home")}
-      >
-        <Text style={headerStyles.headerButtonText}>Menu</Text>
-      </TouchableOpacity>
       <View style={headerStyles.headerRightButtons}>
         <TouchableOpacity
           style={headerStyles.headerButton}
@@ -42,16 +37,14 @@ export default function Header({ navigation }: HeaderProps) {
 
 const headerStyles = {
   header: {
-    flexDirection: "row" as "row",
-    justifyContent: "space-between" as "space-between",
-    alignItems: "center" as "center",
+    paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 5 : 5,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#83b6ae7a",
   } as ViewStyle,
   headerRightButtons: {
-    flexDirection: "row" as "row",
-    alignItems: "center" as "center",
+    flexDirection: "row",
+    alignItems: "flex-end",
   } as ViewStyle,
   headerButton: {
     padding: 10,
