@@ -14,7 +14,7 @@ import {
 import CityDateModal from "../../components/CityDateModal";
 import { City } from "../../models/City";
 import { Weather } from "../../models/Weather";
-import { RootStackParamList } from "../../navigation/Navigations";
+import { RootStackParamList } from "../navigation/Navigations";
 import Header from "./Header";
 
 const HomeScreen = () => {
@@ -63,8 +63,8 @@ const HomeScreen = () => {
     navigation.navigate("Login");
   };
 
-  const handleRegister = () => {
-    navigation.navigate("Register");
+  const handleSignup = () => {
+    navigation.navigate("Signup");
   };
 
   const closeCityDateModal = () => {
@@ -89,7 +89,7 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <Header
         onLogin={handleLogin}
-        onRegister={handleRegister}
+        onRegister={handleSignup}
         navigation={navigation}
       />
 

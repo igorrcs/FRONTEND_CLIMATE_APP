@@ -31,7 +31,7 @@ export default function Header({ navigation }: HeaderProps) {
         </TouchableOpacity>
         <TouchableOpacity
           style={headerStyles.headerButton}
-          onPress={() => navigation.navigate("Register")}
+          onPress={() => navigation.navigate("Signup")}
         >
           <Text style={headerStyles.headerButtonText}>Register</Text>
         </TouchableOpacity>
